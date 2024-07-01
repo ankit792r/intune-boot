@@ -1,6 +1,7 @@
 package com.lmptech.intune.data.models;
 
 import lombok.Data;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
@@ -13,6 +14,10 @@ public class ChatModel {
     String Id;
     String roomId;
     String name;
+
+    @DBRef
     List<UserModel> members;
+
+    @DBRef
     List<MessageModel> messages;
 }

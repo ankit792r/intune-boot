@@ -27,7 +27,7 @@ public class UserService {
     }
 
     public void createUser(UserModel userModel) {
-        userModel.setVerified(false);
+        userModel.setVerified(true);
         mongoTemplate.insert(userModel, "Users");
     }
 
