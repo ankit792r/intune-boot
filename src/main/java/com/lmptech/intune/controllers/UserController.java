@@ -30,7 +30,7 @@ public class UserController {
         return new ResponseEntity<>(userProfile.getFirst(), HttpStatus.OK);
     }
 
-    @PostMapping("new")
+    @PostMapping("register")
     public ResponseEntity<?> addUser(@RequestBody UserModel userModel) {
         try {
             userService.createUser(userModel);
