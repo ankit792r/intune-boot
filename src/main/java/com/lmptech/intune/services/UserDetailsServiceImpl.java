@@ -33,6 +33,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserById(String userId) throws UsernameNotFoundException {
         UserModel userModel = mongoTemplate.findById(userId, UserModel.class);
         if (userModel == null) throw new UsernameNotFoundException("Unknown user");
+        userModel.setUsername(userId); // replacing username form userid because jwt filter needs to verify with id
         return User.withUserDetails(userModel).build();
     }
 }
