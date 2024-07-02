@@ -4,11 +4,15 @@ package com.lmptech.intune.services;
 import com.lmptech.intune.data.models.UserModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
@@ -17,7 +21,16 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private MongoTemplate mongoTemplate;
 
     @Override
-    public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("username").is(username));
+
+        List<UserModel> userModels = mongoTemplate.find(query, UserModel.class);
+        if (userModels.isEmpty()) throw new UsernameNotFoundException("Unknown user");
+        return User.withUserDetails(userModels.getFirst()).build();
+    }
+
+    public UserDetails loadUserById(String userId) throws UsernameNotFoundException {
         UserModel userModel = mongoTemplate.findById(userId, UserModel.class);
         if (userModel == null) throw new UsernameNotFoundException("Unknown user");
         return User.withUserDetails(userModel).build();

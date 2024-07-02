@@ -21,8 +21,8 @@ public class JwtUtility {
 
     public String generateJWTToken(Map<String, Object> claims, String userId) {
         return Jwts.builder()
-                .header().add("alg", "HS256").add("typ", "JWT")
-                .and()
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 6))
                 .subject(userId).claims(claims)
                 .signWith(getSigningKey())
                 .compact();

@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,6 +15,8 @@ import java.util.List;
 @Service
 public class UserService {
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     @Autowired
     private MongoTemplate mongoTemplate;
 
@@ -28,6 +31,7 @@ public class UserService {
 
     public void createUser(UserModel userModel) {
         userModel.setVerified(true);
+        userModel.setPassword(passwordEncoder.encode(userModel.getPassword()));
         mongoTemplate.insert(userModel, "Users");
     }
 

@@ -6,6 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -16,28 +19,31 @@ import java.util.Map;
 public class AuthService {
 
     @Autowired
+    private AuthenticationManager authenticationManager;
+    @Autowired
     private JwtUtility jwtUtility;
 
     @Autowired
     private MongoTemplate mongoTemplate;
 
     public Map<String, Object> login(UserModel userModel) throws Exception {
-        Query query = Query.query(
-                Criteria.where("username").is(userModel.getUsername()));
+        Authentication authenticate = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(userModel.getUsername(), userModel.getPassword()));
 
-        List<UserModel> userModels = mongoTemplate.find(query, UserModel.class, "Users");
+        if (authenticate.isAuthenticated()) {
+            Query query = Query.query(
+                    Criteria.where("username").is(userModel.getUsername()));
 
-        if (userModels.isEmpty()) throw new Exception("User not found");
-        UserModel userModel1 = userModels.getFirst();
+            UserModel dbUser = mongoTemplate.find(query, UserModel.class, "Users").getFirst();
+            dbUser.setPassword(null);
+            String token = jwtUtility.generateJWTToken(new HashMap<>(), dbUser.getId());
 
-        if (userModel1.getPassword().equals(userModel.getPassword())) {
-            userModel1.setPassword("");
             Map<String, Object> res = new HashMap<>();
-            res.put("token", jwtUtility.generateJWTToken(new HashMap<>(), userModel1.getId()));
-            res.put("user", userModel1);
+            res.put("token", token);
+            res.put("user", dbUser);
 
             return res;
-        } else throw new Exception("wrong password");
+        } else throw new Exception("wrong username or password");
     }
 
     public String verify(String token) {

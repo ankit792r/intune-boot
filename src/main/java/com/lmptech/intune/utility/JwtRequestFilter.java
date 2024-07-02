@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -36,23 +37,23 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         System.out.println("----------filtering request");
 
-        String token = null, userId = null;
         String header = request.getHeader("Authorization");
-        if (header != null && header.startsWith("Bearer ")) {
-            token = header.substring(7);
-            userId = jwtUtility.getUserId(token);
+        if (header == null || !(header.startsWith("Bearer "))) {
+            filterChain.doFilter(request, response);
+            return;
         }
 
+        String token = header.substring(7);
+        String userId = jwtUtility.getUserId(token);
+
         if(userId != null && SecurityContextHolder.getContext().getAuthentication() == null){
-            UserDetails details = userDetailsService.loadUserByUsername(userId);
+            UserDetails details = userDetailsService.loadUserById(userId);
             if(jwtUtility.validateToken(token, details)){
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(details, null, details.getAuthorities());
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
         }
-
-
         filterChain.doFilter(request, response);
     }
 }
