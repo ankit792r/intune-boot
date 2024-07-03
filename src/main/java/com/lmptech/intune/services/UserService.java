@@ -25,7 +25,9 @@ public class UserService {
     }
 
     public List<UserModel> getUserProfile(String id) {
-        Query query = Query.query(Criteria.where("_id").is(id));
+        Query query = new Query();
+        query.addCriteria(Criteria.where("_id").is(id));
+        query.fields().include("_id", "name", "username");
         return mongoTemplate.find(query, UserModel.class);
     }
 
