@@ -6,6 +6,8 @@ import com.lmptech.intune.services.ChatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,11 +32,23 @@ public class ChatController {
         return new ResponseEntity<>(chatService.getAllRequests(), HttpStatus.OK);
     }
 
+    @GetMapping("user")
+    public ResponseEntity<?> getUserChats(){
+        User principal = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        try {
+            Map<String, Object> userChats = chatService.getUserChats(principal.getUsername());
+            return new ResponseEntity<>(userChats, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ErrorMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+    }
+
     @GetMapping("new")
     public ResponseEntity<?> newRequest() {
         try {
 
-            RequestModel result = chatService.newChatRequest("ankit", "indra");
+            RequestModel result = chatService.newChatRequest("ankit", "test");
             return new ResponseEntity<>(result, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new ErrorMessage(e.getMessage()), HttpStatus.BAD_REQUEST);

@@ -1,6 +1,7 @@
 package com.lmptech.intune.services;
 
 
+import com.lmptech.intune.data.models.UserDetailsImpl;
 import com.lmptech.intune.data.models.UserModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -27,13 +28,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         List<UserModel> userModels = mongoTemplate.find(query, UserModel.class);
         if (userModels.isEmpty()) throw new UsernameNotFoundException("Unknown user");
-        return User.withUserDetails(userModels.getFirst()).build();
+        return User.withUserDetails(new UserDetailsImpl(userModels.getFirst())).build();
     }
 
     public UserDetails loadUserById(String userId) throws UsernameNotFoundException {
         UserModel userModel = mongoTemplate.findById(userId, UserModel.class);
         if (userModel == null) throw new UsernameNotFoundException("Unknown user");
         userModel.setUsername(userId); // replacing username form userid because jwt filter needs to verify with id
-        return User.withUserDetails(userModel).build();
+        return User.withUserDetails(new UserDetailsImpl(userModel)).build();
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -24,15 +25,26 @@ public class UserService {
         return mongoTemplate.findAll(UserModel.class, "Users");
     }
 
-    public List<UserModel> getUserProfile(String id) {
+    public List<UserModel> getUserProfile(List<String> ids) {
         Query query = new Query();
-        query.addCriteria(Criteria.where("_id").is(id));
+        query.addCriteria(Criteria.where("_id").in(ids));
         query.fields().include("_id", "name", "username");
         return mongoTemplate.find(query, UserModel.class);
     }
 
+    public UserModel getUserData(String userId) throws Exception {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("_id").is(userId));
+        query.fields().exclude("chats", "password");
+
+        UserModel userModel = mongoTemplate.findOne(query, UserModel.class);
+        if (userModel == null) throw new Exception("user not found");
+        return userModel;
+    }
+
     public void createUser(UserModel userModel) {
-        userModel.setVerified(true);
+        userModel.setRequests(new ArrayList<>());
+        userModel.setChats(new ArrayList<>());
         userModel.setPassword(passwordEncoder.encode(userModel.getPassword()));
         mongoTemplate.insert(userModel, "Users");
     }

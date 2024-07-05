@@ -20,7 +20,7 @@ public class AuthController {
     @PostMapping("login")
     public ResponseEntity<?> userLogin(@RequestBody UserModel userModel) {
         try {
-            Map<String, Object> res = authService.login(userModel);
+            Map<String, String> res = authService.login(userModel);
             return new ResponseEntity<>(res, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new ErrorMessage(e.getMessage()), HttpStatus.BAD_REQUEST);

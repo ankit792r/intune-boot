@@ -31,6 +31,20 @@ public class ChatService {
         return mongoTemplate.findAll(RequestModel.class);
     }
 
+    public Map<String, Object> getUserChats(String userId) throws Exception {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("_id").is(userId));
+        query.fields().include("chats");
+
+        UserModel userModel = mongoTemplate.findOne(query, UserModel.class);
+        if (userModel == null) throw new Exception("user not found");
+
+        Map<String, Object> res = new HashMap<>();
+        res.put("chats", userModel.chats);
+
+        return res;
+    }
+
     // TODO make transaction
     public RequestModel newChatRequest(String senderUsername, String receiverUsername) throws Exception {
         Query query = new Query();
@@ -82,13 +96,14 @@ public class ChatService {
 
         Query userQuery = new Query();
         userQuery.addCriteria(Criteria.where("_id").in(removedRequest.getSenderId(), removedRequest.getReceiverId()));
-        userQuery.fields().include("_id", "requests");
 
         List<UserModel> userModels = mongoTemplate.find(userQuery, UserModel.class);
         if (userModels.isEmpty()) throw new Exception("users not found");
 
         ChatModel chatModel = mongoTemplate.insert(
-                new ChatModel(null, "tst", "nam", userModels, new ArrayList<>()), "Chats");
+                new ChatModel(null, "tst", "nam",
+                        List.of(removedRequest.getSenderId(), removedRequest.getReceiverId()),
+                        new ArrayList<>()), "Chats");
 
         Update update = new Update();
         update.pull("requests", removedRequest);

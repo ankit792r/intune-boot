@@ -1,7 +1,6 @@
 package com.lmptech.intune.data.models;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.*;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
@@ -11,16 +10,17 @@ import java.util.List;
 
 
 @Document("Chats")
-@Data
 @AllArgsConstructor
+@NoArgsConstructor
+@Setter
+@Getter
 public class ChatModel {
     @MongoId
     String Id;
     String roomId;
     String name;
 
-    @DBRef
-    List<UserModel> members;
+    List<String> members;
 
-    List<MessageModel> messages = new ArrayList<>();
+    List<MessageModel> messages;
 }

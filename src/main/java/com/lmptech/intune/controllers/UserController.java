@@ -7,6 +7,8 @@ import com.mongodb.client.result.UpdateResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,11 +25,21 @@ public class UserController {
         return userService.getAllUser();
     }
 
-    @GetMapping("get/{id}")
-    public ResponseEntity<?> getUserProfile(@PathVariable String id) {
-        List<UserModel> userProfile = userService.getUserProfile(id);
-        if (userProfile.isEmpty()) return new ResponseEntity<>(new ErrorMessage("user not found"), HttpStatus.BAD_REQUEST);
-        return new ResponseEntity<>(userProfile.getFirst(), HttpStatus.OK);
+    @PostMapping("profile")
+    public ResponseEntity<?> getUserProfile(@RequestBody List<String> ids) {
+        List<UserModel> userProfile = userService.getUserProfile(ids);
+        return new ResponseEntity<>(userProfile, HttpStatus.OK);
+    }
+
+    @GetMapping("data")
+    public ResponseEntity<?> getUserData() {
+        User principal = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        try {
+        UserModel userProfile = userService.getUserData(principal.getUsername());
+        return new ResponseEntity<>(userProfile, HttpStatus.OK);
+    } catch (Exception e) {
+        return new ResponseEntity<>(new ErrorMessage("email or username already used"), HttpStatus.BAD_REQUEST);
+    }
     }
 
     @PostMapping("register")
