@@ -8,11 +8,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.*;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,6 +31,9 @@ public class WebSecurityConfig {
 
     @Autowired
     private JwtRequestFilter jwtRequestFilter;
+
+    @Autowired
+    private JwtAuthenticationEntryPoint authenticationEntryPoint;
 
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
@@ -53,8 +57,10 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
+        httpSecurity.cors(httpSecurityCorsConfigurer ->
+                httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource()));
+
         httpSecurity.sessionManagement(sessionManagementConfigurer ->
                 sessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
 
@@ -64,27 +70,29 @@ public class WebSecurityConfig {
                     .requestMatchers("auth/**").permitAll()
                     .requestMatchers("user/register").permitAll()
                     .anyRequest().authenticated();
-
-            httpSecurity.authenticationProvider(authenticationProvider());
-            httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
         });
 
+        httpSecurity.exceptionHandling(exceptionHandlingConfigurer ->
+                exceptionHandlingConfigurer.authenticationEntryPoint(authenticationEntryPoint));
+
+        httpSecurity.authenticationProvider(authenticationProvider());
         httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
         return httpSecurity.build();
     }
 
 
+    @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of("http://localhost:8005"));
-        configuration.setAllowedMethods(List.of("GET","POST"));
-        configuration.setAllowedHeaders(List.of("Authorization","Content-Type"));
+//        configuration.setAllowedOrigins(List.of("*"));
+//        configuration.setAllowedMethods(List.of("GET","POST", "PUT", "PATCH", "DELETE"));
+//        configuration.setAllowedHeaders(List.of("*"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 
-        source.registerCorsConfiguration("/**",configuration);
+        source.registerCorsConfiguration("/**", configuration);
 
         return source;
     }

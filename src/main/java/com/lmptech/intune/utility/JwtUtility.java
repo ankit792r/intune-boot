@@ -19,10 +19,12 @@ public class JwtUtility {
         return Keys.hmacShaKeyFor(SECRET.getBytes());
     }
 
-    public String generateJWTToken(Map<String, Object> claims, String userId) {
+    public String generateJWTToken(Map<String, Object> claims, String userId, boolean access) {
+        int expire = 60 * 3 * (access ? 1 : 24 );
+
         return Jwts.builder()
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
+                .expiration(new Date(System.currentTimeMillis() + (expire * 1000)))
                 .subject(userId).claims(claims)
                 .signWith(getSigningKey())
                 .compact();

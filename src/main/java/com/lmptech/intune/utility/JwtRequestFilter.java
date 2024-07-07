@@ -1,6 +1,7 @@
 package com.lmptech.intune.utility;
 
 import com.lmptech.intune.services.UserDetailsServiceImpl;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,9 +37,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
-
-        System.out.println("----------filtering request");
-
         String header = request.getHeader("Authorization");
         if (header == null || !(header.startsWith("Bearer "))) {
             filterChain.doFilter(request, response);
@@ -59,10 +57,10 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                     securityContext.setAuthentication(authenticationToken);
                 }
             }
+        } catch (ExpiredJwtException expiredJwtException) {
+            response.sendError(HttpStatus.CONFLICT.value(), "token expired");
+        } finally {
             filterChain.doFilter(request, response);
-        } catch (Exception e) {
-            response.sendError(HttpStatus.UNAUTHORIZED.value(), e.getMessage());
-            //filterChain.doFilter(request, response);
         }
     }
 }

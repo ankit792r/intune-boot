@@ -31,16 +31,21 @@ public class AuthService {
         if (authenticate.isAuthenticated()) {
             User principal = (User) authenticate.getPrincipal();
 
-            String token = jwtUtility.generateJWTToken(new HashMap<>(), principal.getUsername());
+            String access = jwtUtility.generateJWTToken(new HashMap<>(), principal.getUsername(), true);
+            String refresh = jwtUtility.generateJWTToken(new HashMap<>(), principal.getUsername(), false);
 
             Map<String, String> response = new HashMap<>();
-            response.put("token", token);
+            response.put("access", access);
+            response.put("refresh", refresh);
 
             return response;
         } else throw new Exception("wrong username or password");
     }
 
-    public String verify(String token) {
-        return "";
+    public Map<String, String> refreshToken(String userId) {
+        String access = jwtUtility.generateJWTToken(new HashMap<>(), userId, true);
+        Map<String, String> response = new HashMap<>();
+        response.put("access", access);
+        return response;
     }
 }

@@ -31,7 +31,7 @@ public class ChatService {
         return mongoTemplate.findAll(RequestModel.class);
     }
 
-    public Map<String, Object> getUserChats(String userId) throws Exception {
+    public List<ChatModel> getUserChats(String userId) throws Exception {
         Query query = new Query();
         query.addCriteria(Criteria.where("_id").is(userId));
         query.fields().include("chats");
@@ -39,10 +39,7 @@ public class ChatService {
         UserModel userModel = mongoTemplate.findOne(query, UserModel.class);
         if (userModel == null) throw new Exception("user not found");
 
-        Map<String, Object> res = new HashMap<>();
-        res.put("chats", userModel.chats);
-
-        return res;
+        return userModel.chats;
     }
 
     // TODO make transaction

@@ -1,5 +1,6 @@
 package com.lmptech.intune.controllers;
 
+import com.lmptech.intune.data.models.ChatModel;
 import com.lmptech.intune.data.models.RequestModel;
 import com.lmptech.intune.data.models.response.ErrorMessage;
 import com.lmptech.intune.services.ChatService;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -37,7 +39,7 @@ public class ChatController {
         User principal = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         try {
-            Map<String, Object> userChats = chatService.getUserChats(principal.getUsername());
+            List<ChatModel> userChats = chatService.getUserChats(principal.getUsername());
             return new ResponseEntity<>(userChats, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new ErrorMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
