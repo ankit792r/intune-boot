@@ -35,8 +35,8 @@ public class AuthService {
             String refresh = jwtUtility.generateJWTToken(new HashMap<>(), principal.getUsername(), false);
 
             Map<String, String> response = new HashMap<>();
-            response.put("access", access);
-            response.put("refresh", refresh);
+            response.put("accessToken", access);
+            response.put("refreshToken", refresh);
 
             return response;
         } else throw new Exception("wrong username or password");

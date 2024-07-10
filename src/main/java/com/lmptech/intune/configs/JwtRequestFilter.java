@@ -1,7 +1,9 @@
-package com.lmptech.intune.utility;
+package com.lmptech.intune.configs;
 
 import com.lmptech.intune.services.UserDetailsServiceImpl;
+import com.lmptech.intune.utility.JwtUtility;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,11 +12,11 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -57,10 +59,13 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                     securityContext.setAuthentication(authenticationToken);
                 }
             }
+            filterChain.doFilter(request, response);
         } catch (ExpiredJwtException expiredJwtException) {
             response.sendError(HttpStatus.CONFLICT.value(), "token expired");
-        } finally {
-            filterChain.doFilter(request, response);
+        } catch (MalformedJwtException malformedJwtException) {
+            response.sendError(HttpStatus.FORBIDDEN.value(), "malformed token");
+        } catch (AccessDeniedException accessDeniedException) {
+            response.sendError(HttpStatus.UNAUTHORIZED.value(), "Access denied");
         }
     }
 }

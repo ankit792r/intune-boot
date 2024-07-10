@@ -20,7 +20,7 @@ public class JwtUtility {
     }
 
     public String generateJWTToken(Map<String, Object> claims, String userId, boolean access) {
-        int expire = 60 * 3 * (access ? 1 : 24 );
+        int expire = 60 * 60 * (access ? 1 : 24 );
 
         return Jwts.builder()
                 .issuedAt(new Date(System.currentTimeMillis()))
