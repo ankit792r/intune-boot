@@ -48,6 +48,17 @@ public class ChatController {
         }
     }
 
+    @GetMapping("byId/{chatId}")
+    public ResponseEntity<?> getChatData(@PathVariable("chatId") String chatId) {
+        try {
+            ChatModel chatData = chatService.getChatData(chatId);
+            return new ResponseEntity<>(chatData, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ErrorMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    // all methods below will be call with socket events
     @GetMapping("new-request")
     public ResponseEntity<?> newRequest() {
         try {

@@ -109,4 +109,10 @@ public class ChatService {
 
         return mongoTemplate.find(query, RequestModel.class);
     }
+
+    public ChatModel getChatData(String chatId) throws Exception {
+        ChatModel chatModel = mongoTemplate.findById(chatId, ChatModel.class);
+        if (chatModel == null) throw new Exception("chat not found");
+        return chatModel;
+    }
 }
