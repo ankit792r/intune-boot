@@ -49,12 +49,20 @@ public class UserService {
         mongoTemplate.insert(userModel, "Users");
     }
 
-    public UpdateResult updateUser(UserModel userModel) {
+    public UpdateResult updateUser(UserModel userModel, String section) throws Exception {
         Query query = Query.query(Criteria.where("_id").is(userModel.getId()));
 
         Update update = new Update();
-                update.set("name", userModel.getName());
-                update.set("username", userModel.getUsername());
+
+        if (section.equals("profile")) {
+            update.set("name", userModel.getName());
+            update.set("username", userModel.getUsername());
+        } else if (section.equals("account")) {
+            update.set("email", userModel.getEmail());
+            update.set("password", userModel.getPassword());
+        } else {
+            throw new Exception("update section is not defined");
+        }
 
         return mongoTemplate.updateFirst(query, update, UserModel.class);
     }

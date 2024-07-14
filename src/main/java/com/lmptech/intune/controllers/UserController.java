@@ -11,11 +11,16 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("user")
 public class UserController {
+
+    List<String> sections = Arrays.asList("profile", "account");
 
     @Autowired
     private UserService userService;
@@ -31,33 +36,43 @@ public class UserController {
         return new ResponseEntity<>(userProfile, HttpStatus.OK);
     }
 
-    @GetMapping("data")
+    @GetMapping("me")
     public ResponseEntity<?> getUserData() {
         User principal = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         try {
-        UserModel userProfile = userService.getUserData(principal.getUsername());
-        return new ResponseEntity<>(userProfile, HttpStatus.OK);
-    } catch (Exception e) {
-        return new ResponseEntity<>(new ErrorMessage("email or username already used"), HttpStatus.BAD_REQUEST);
-    }
+            UserModel userProfile = userService.getUserData(principal.getUsername());
+            return new ResponseEntity<>(userProfile, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ErrorMessage("email or username already used"), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PostMapping("register")
     public ResponseEntity<?> addUser(@RequestBody UserModel userModel) {
         try {
             userService.createUser(userModel);
-            return new ResponseEntity<>("created", HttpStatus.CREATED);
+            Map<String, String> res = new HashMap<>();
+            res.put("message", "created");
+            return new ResponseEntity<>(res, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(new ErrorMessage("email or username already used"), HttpStatus.BAD_REQUEST);
         }
     }
 
-    @PutMapping("update")
-    public ResponseEntity<?> updateUser(@RequestBody UserModel userModel) {
-        UpdateResult updateResult = userService.updateUser(userModel);
-        if (updateResult.wasAcknowledged())
-            return new ResponseEntity<>(updateResult, HttpStatus.OK);
-        else
-            return new ResponseEntity<>(new ErrorMessage("something went wrong"), HttpStatus.SERVICE_UNAVAILABLE);
+    @PutMapping("update/{section}")
+    public ResponseEntity<?> updateProfile(@PathVariable String section, @RequestBody UserModel userModel) {
+        if (!sections.contains(section))
+            return new ResponseEntity<>(new ErrorMessage("update section is not defined"), HttpStatus.BAD_REQUEST);
+
+        try {
+            UpdateResult updateResult = userService.updateUser(userModel, section);
+            if (updateResult.wasAcknowledged())
+                return new ResponseEntity<>(updateResult, HttpStatus.OK);
+            else
+                return new ResponseEntity<>(new ErrorMessage("something went wrong"), HttpStatus.SERVICE_UNAVAILABLE);
+        } catch (Exception e) {
+            System.out.println(e.getLocalizedMessage());
+            return new ResponseEntity<>(new ErrorMessage(e.getLocalizedMessage()), HttpStatus.BAD_REQUEST);
+        }
     }
 }

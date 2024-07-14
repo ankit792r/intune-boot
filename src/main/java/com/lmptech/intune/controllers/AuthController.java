@@ -26,7 +26,7 @@ public class AuthController {
             Map<String, String> res = authService.login(userModel);
             return new ResponseEntity<>(res, HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(new ErrorMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ErrorMessage(e.getLocalizedMessage()), HttpStatus.BAD_REQUEST);
         }
     }
 
