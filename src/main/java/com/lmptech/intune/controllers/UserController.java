@@ -24,19 +24,9 @@ public class UserController {
 
     @PostMapping("profiles")
     public ResponseEntity<?> getUserProfile(@RequestBody List<String> ids) {
-        List<UserModel> userProfile = userService.getUserProfile(ids);
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        List<UserModel> userProfile = userService.getUserProfile(user.getUsername(), ids);
         return new ResponseEntity<>(userProfile, HttpStatus.OK);
-    }
-
-    @GetMapping("my-profile")
-    public ResponseEntity<?> getUserData() {
-        User principal = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        try {
-            UserModel userProfile = userService.getUserData(principal.getUsername());
-            return new ResponseEntity<>(userProfile, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(new ErrorMessage("email or username already used"), HttpStatus.BAD_REQUEST);
-        }
     }
 
     @PostMapping("register")
