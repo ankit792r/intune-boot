@@ -1,9 +1,8 @@
 package com.lmptech.intune.controllers;
 
 import com.lmptech.intune.models.ChatModel;
-import com.lmptech.intune.models.RequestModel;
 import com.lmptech.intune.models.ErrorMessage;
-import com.lmptech.intune.models.UserModel;
+import com.lmptech.intune.models.RequestModel;
 import com.lmptech.intune.services.ChatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,23 +24,25 @@ public class ChatController {
     @Autowired
     private ChatService chatService;
 
-    @GetMapping("all")
-    public ResponseEntity<?> getAllChats() {
-        return new ResponseEntity<>(chatService.getAllChats(), HttpStatus.OK);
-    }
-
-    @GetMapping("all-requests")
-    public ResponseEntity<?> getAllRequests() {
-        return new ResponseEntity<>(chatService.getAllRequests(), HttpStatus.OK);
-    }
-
-    @GetMapping("user")
+    @GetMapping("user-chats")
     public ResponseEntity<?> getUserChats(){
         User principal = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         try {
             List<ChatModel> userChats = chatService.getUserChats(principal.getUsername());
             return new ResponseEntity<>(userChats, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ErrorMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("user-requests")
+    public ResponseEntity<?> userRequests() {
+        User principal = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        try {
+            List<RequestModel> requestModels = chatService.getUserRequests(principal.getUsername());
+            return new ResponseEntity<>(requestModels, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new ErrorMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
@@ -73,18 +74,6 @@ public class ChatController {
         try {
             Map<String, Object> result = chatService.acceptChatRequest(requestId);
             return new ResponseEntity<>(result, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(new ErrorMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    @GetMapping("user-requests")
-    public ResponseEntity<?> userRequests() {
-        User principal = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        try {
-            List<RequestModel> requestModels = chatService.userRequests(principal.getUsername());
-            return new ResponseEntity<>(requestModels, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new ErrorMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
         }

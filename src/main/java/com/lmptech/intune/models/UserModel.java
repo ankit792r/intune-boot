@@ -17,8 +17,6 @@ public class UserModel {
     @MongoId
     public String id;
 
-    public String name;
-
     @Indexed(unique = true, background = true)
     public String email;
 

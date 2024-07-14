@@ -22,14 +22,6 @@ public class ChatService {
     @Autowired
     private MongoTemplate mongoTemplate;
 
-    public List<ChatModel> getAllChats() {
-        return mongoTemplate.findAll(ChatModel.class);
-    }
-
-    public List<RequestModel> getAllRequests() {
-        return mongoTemplate.findAll(RequestModel.class);
-    }
-
     public List<ChatModel> getUserChats(String userId) throws Exception {
 
         UserModel byId = mongoTemplate.findById(userId, UserModel.class);
@@ -45,7 +37,7 @@ public class ChatService {
     public RequestModel newChatRequest(String senderUsername, String receiverUsername) throws Exception {
         Query query = new Query();
         query.addCriteria(Criteria.where("username").in(senderUsername, receiverUsername));
-        query.fields().include("name", "username");
+        query.fields().include("username");
 
         List<UserModel> userModels = mongoTemplate.find(query, UserModel.class);
         if (userModels.size() != 2) throw new Exception(String.format("user with username %s is not exists", receiverUsername));
@@ -107,7 +99,7 @@ public class ChatService {
         return result;
     }
 
-    public List<RequestModel> userRequests(String userId) throws Exception {
+    public List<RequestModel> getUserRequests(String userId) throws Exception {
         UserModel byId = mongoTemplate.findById(userId, UserModel.class);
         if (byId == null) throw new Exception("user not found");
         List<String> requestIds = byId.getRequestIds();

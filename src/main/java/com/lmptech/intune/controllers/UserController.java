@@ -19,13 +19,10 @@ import java.util.Map;
 @RestController
 @RequestMapping("user")
 public class UserController {
-
-    List<String> sections = Arrays.asList("profile", "account");
-
     @Autowired
     private UserService userService;
 
-    @PostMapping("profile")
+    @PostMapping("profiles")
     public ResponseEntity<?> getUserProfile(@RequestBody List<String> ids) {
         List<UserModel> userProfile = userService.getUserProfile(ids);
         return new ResponseEntity<>(userProfile, HttpStatus.OK);
@@ -51,23 +48,6 @@ public class UserController {
             return new ResponseEntity<>(res, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(new ErrorMessage("email or username already used"), HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    @PutMapping("update/{section}")
-    public ResponseEntity<?> updateProfile(@PathVariable String section, @RequestBody UserModel userModel) {
-        if (!sections.contains(section))
-            return new ResponseEntity<>(new ErrorMessage("update section is not defined"), HttpStatus.BAD_REQUEST);
-
-        try {
-            UpdateResult updateResult = userService.updateUser(userModel, section);
-            if (updateResult.wasAcknowledged())
-                return new ResponseEntity<>(updateResult, HttpStatus.OK);
-            else
-                return new ResponseEntity<>(new ErrorMessage("something went wrong"), HttpStatus.SERVICE_UNAVAILABLE);
-        } catch (Exception e) {
-            System.out.println(e.getLocalizedMessage());
-            return new ResponseEntity<>(new ErrorMessage(e.getLocalizedMessage()), HttpStatus.BAD_REQUEST);
         }
     }
 }

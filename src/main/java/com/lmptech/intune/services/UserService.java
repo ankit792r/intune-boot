@@ -21,14 +21,10 @@ public class UserService {
     @Autowired
     private MongoTemplate mongoTemplate;
 
-    public List<UserModel> getAllUser() {
-        return mongoTemplate.findAll(UserModel.class, "Users");
-    }
-
     public List<UserModel> getUserProfile(List<String> ids) {
         Query query = new Query();
         query.addCriteria(Criteria.where("_id").in(ids));
-        query.fields().include("_id", "name", "username");
+        query.fields().include("_id", "username");
         return mongoTemplate.find(query, UserModel.class);
     }
 
@@ -47,23 +43,5 @@ public class UserService {
         userModel.setChatIds(new ArrayList<>());
         userModel.setPassword(passwordEncoder.encode(userModel.getPassword()));
         mongoTemplate.insert(userModel, "Users");
-    }
-
-    public UpdateResult updateUser(UserModel userModel, String section) throws Exception {
-        Query query = Query.query(Criteria.where("_id").is(userModel.getId()));
-
-        Update update = new Update();
-
-        if (section.equals("profile")) {
-            update.set("name", userModel.getName());
-            update.set("username", userModel.getUsername());
-        } else if (section.equals("account")) {
-            update.set("email", userModel.getEmail());
-            update.set("password", userModel.getPassword());
-        } else {
-            throw new Exception("update section is not defined");
-        }
-
-        return mongoTemplate.updateFirst(query, update, UserModel.class);
     }
 }
