@@ -26,7 +26,7 @@ public class AuthService {
 
     public Map<String, String> login(UserModel userModel) throws Exception {
             Authentication authenticate = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(userModel.getUsername(), userModel.getPassword()));
+                new UsernamePasswordAuthenticationToken(userModel.getEmail(), userModel.getPassword()));
 
         if (authenticate.isAuthenticated()) {
             User principal = (User) authenticate.getPrincipal();

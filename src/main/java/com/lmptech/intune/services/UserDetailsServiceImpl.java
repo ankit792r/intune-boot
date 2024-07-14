@@ -22,9 +22,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private MongoTemplate mongoTemplate;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Query query = new Query();
-        query.addCriteria(Criteria.where("username").is(username));
+        query.addCriteria(Criteria.where("email").is(email));
 
         List<UserModel> userModels = mongoTemplate.find(query, UserModel.class);
         if (userModels.isEmpty()) throw new UsernameNotFoundException("Unknown user");
