@@ -1,4 +1,4 @@
-package com.lmptech.intune.data.models;
+package com.lmptech.intune.models;
 
 
 import lombok.*;
@@ -27,22 +27,7 @@ public class UserModel {
 
     public String password;
 
-    @DBRef
-    public List<ChatModel> chats;
+    public List<String> chatIds;
 
-    @DBRef
-    public List<RequestModel> requests;
-
-    @Override
-    public String toString() {
-        return "UserModel{" +
-                "id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                ", email='" + email + '\'' +
-                ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                ", chats=" + chats +
-                ", requests=" + requests +
-                '}';
-    }
+    public List<String> requestIds;
 }

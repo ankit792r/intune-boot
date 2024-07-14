@@ -1,4 +1,4 @@
-package com.lmptech.intune.data.models.response;
+package com.lmptech.intune.models;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

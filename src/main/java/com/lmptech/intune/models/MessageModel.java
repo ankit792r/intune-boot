@@ -1,4 +1,4 @@
-package com.lmptech.intune.data.models;
+package com.lmptech.intune.models;
 
 import java.util.Date;
 

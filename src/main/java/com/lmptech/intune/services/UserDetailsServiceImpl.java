@@ -1,8 +1,8 @@
 package com.lmptech.intune.services;
 
 
-import com.lmptech.intune.data.models.UserDetailsImpl;
-import com.lmptech.intune.data.models.UserModel;
+import com.lmptech.intune.models.UserDetailsImpl;
+import com.lmptech.intune.models.UserModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;

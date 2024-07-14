@@ -1,8 +1,9 @@
 package com.lmptech.intune.controllers;
 
-import com.lmptech.intune.data.models.ChatModel;
-import com.lmptech.intune.data.models.RequestModel;
-import com.lmptech.intune.data.models.response.ErrorMessage;
+import com.lmptech.intune.models.ChatModel;
+import com.lmptech.intune.models.RequestModel;
+import com.lmptech.intune.models.ErrorMessage;
+import com.lmptech.intune.models.UserModel;
 import com.lmptech.intune.services.ChatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -46,7 +47,7 @@ public class ChatController {
         }
     }
 
-    @GetMapping("new")
+    @GetMapping("new-request")
     public ResponseEntity<?> newRequest() {
         try {
 
@@ -57,7 +58,7 @@ public class ChatController {
         }
     }
 
-    @GetMapping("cancel/{requestId}")
+    @GetMapping("cancel-request/{requestId}")
     public ResponseEntity<?> cancelRequest(@PathVariable String requestId) {
         try {
             RequestModel result = chatService.cancelChatRequest(requestId);
@@ -67,11 +68,23 @@ public class ChatController {
         }
     }
 
-    @GetMapping("accept/{requestId}")
-    public ResponseEntity<?> test(@PathVariable String requestId) {
+    @GetMapping("accept-request/{requestId}")
+    public ResponseEntity<?> acceptRequest(@PathVariable String requestId) {
         try {
             Map<String, Object> result = chatService.acceptChatRequest(requestId);
             return new ResponseEntity<>(result, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ErrorMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("user-requests")
+    public ResponseEntity<?> userRequests() {
+        User principal = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        try {
+            List<RequestModel> requestModels = chatService.userRequests(principal.getUsername());
+            return new ResponseEntity<>(requestModels, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new ErrorMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
         }

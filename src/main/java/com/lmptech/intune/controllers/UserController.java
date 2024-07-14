@@ -1,7 +1,7 @@
 package com.lmptech.intune.controllers;
 
-import com.lmptech.intune.data.models.UserModel;
-import com.lmptech.intune.data.models.response.ErrorMessage;
+import com.lmptech.intune.models.UserModel;
+import com.lmptech.intune.models.ErrorMessage;
 import com.lmptech.intune.services.UserService;
 import com.mongodb.client.result.UpdateResult;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,18 +25,13 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("")
-    public List<UserModel> allUser() {
-        return userService.getAllUser();
-    }
-
     @PostMapping("profile")
     public ResponseEntity<?> getUserProfile(@RequestBody List<String> ids) {
         List<UserModel> userProfile = userService.getUserProfile(ids);
         return new ResponseEntity<>(userProfile, HttpStatus.OK);
     }
 
-    @GetMapping("me")
+    @GetMapping("my-profile")
     public ResponseEntity<?> getUserData() {
         User principal = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         try {

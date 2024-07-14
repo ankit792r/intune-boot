@@ -1,9 +1,8 @@
 package com.lmptech.intune.services;
 
-import com.lmptech.intune.data.models.ChatModel;
-import com.lmptech.intune.data.models.RequestModel;
-import com.lmptech.intune.data.models.UserModel;
-import com.mongodb.client.result.UpdateResult;
+import com.lmptech.intune.models.ChatModel;
+import com.lmptech.intune.models.RequestModel;
+import com.lmptech.intune.models.UserModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
@@ -32,32 +31,33 @@ public class ChatService {
     }
 
     public List<ChatModel> getUserChats(String userId) throws Exception {
+
+        UserModel byId = mongoTemplate.findById(userId, UserModel.class);
+        if (byId == null) throw new Exception("User not found");
+
         Query query = new Query();
-        query.addCriteria(Criteria.where("_id").is(userId));
-        query.fields().include("chats");
+        query.addCriteria(Criteria.where("_id").in(byId.getChatIds()));
 
-        UserModel userModel = mongoTemplate.findOne(query, UserModel.class);
-        if (userModel == null) throw new Exception("user not found");
-
-        return userModel.chats;
+        return mongoTemplate.find(query, ChatModel.class);
     }
 
     // TODO make transaction
     public RequestModel newChatRequest(String senderUsername, String receiverUsername) throws Exception {
         Query query = new Query();
         query.addCriteria(Criteria.where("username").in(senderUsername, receiverUsername));
-        query.fields().include("_id", "requests");
+        query.fields().include("name", "username");
 
         List<UserModel> userModels = mongoTemplate.find(query, UserModel.class);
-        if (userModels.isEmpty()) throw new Exception(String.format("user with username %s is not exists", receiverUsername));
+        if (userModels.size() != 2) throw new Exception(String.format("user with username %s is not exists", receiverUsername));
 
-        RequestModel requests = mongoTemplate.insert(
-                new RequestModel(null, userModels.getLast().getId(), userModels.getFirst().getId()), "Requests");
+        // TODO check weather sender is last or receiver
+        RequestModel request = mongoTemplate.insert(
+                new RequestModel(null, userModels.getFirst(), userModels.getLast()), "Requests");
 
         Update update = new Update();
-        update.push("requests", requests);
+        update.push("requestIds", request.getId());
         mongoTemplate.updateMulti(query, update, UserModel.class);
-        return requests;
+        return request;
     }
 
     // TODO make it transaction
@@ -70,19 +70,20 @@ public class ChatService {
         if (removedRequest == null) throw new Exception("request not exists");
 
         Query userQuery = new Query();
-        userQuery.addCriteria(Criteria.where("_id").in(removedRequest.getSenderId(), removedRequest.getReceiverId()));
+        userQuery.addCriteria(Criteria.where("_id").in(removedRequest.getSender().getId(), removedRequest.getReceiver().getId()));
         userQuery.fields().include("_id", "requests");
 
         List<UserModel> userModels = mongoTemplate.find(userQuery, UserModel.class);
-        if (userModels.isEmpty()) throw new Exception("users not found");
+        if (userModels.size() != 2) throw new Exception("users not found");
 
         Update update = new Update();
-        update.pull("requests", removedRequest);
+        update.pull("requestIds", removedRequest.getId());
         mongoTemplate.updateMulti(userQuery, update, UserModel.class);
 
         return removedRequest;
     }
 
+    // TODO only receiver can accept the request
     public Map<String, Object> acceptChatRequest(String requestId) throws Exception {
         Query query = new Query();
         query.addCriteria(Criteria.where("_id").is(requestId));
@@ -90,26 +91,30 @@ public class ChatService {
 
         if (removedRequest == null) throw new Exception("request not exists");
 
-
         Query userQuery = new Query();
-        userQuery.addCriteria(Criteria.where("_id").in(removedRequest.getSenderId(), removedRequest.getReceiverId()));
+        userQuery.addCriteria(Criteria.where("_id").in(removedRequest.getSender().getId(), removedRequest.getReceiver().getId()));
 
-        List<UserModel> userModels = mongoTemplate.find(userQuery, UserModel.class);
-        if (userModels.isEmpty()) throw new Exception("users not found");
-
-        ChatModel chatModel = mongoTemplate.insert(
-                new ChatModel(null, "tst", "nam",
-                        List.of(removedRequest.getSenderId(), removedRequest.getReceiverId()),
-                        new ArrayList<>()), "Chats");
+        ChatModel chatModel = mongoTemplate.insert(new ChatModel(null, "tst", "nam", List.of(removedRequest.getSender(), removedRequest.getReceiver()), new ArrayList<>()), "Chats");
 
         Update update = new Update();
-        update.pull("requests", removedRequest);
-        update.push("chats", chatModel);
+        update.pull("requestIds", removedRequest.getId());
+        update.push("chatIds", chatModel.getId());
         mongoTemplate.updateMulti(userQuery, update, UserModel.class);
 
         Map<String, Object> result = new HashMap<>();
-        result.put("request", removedRequest);
+        result.put("requestId", removedRequest.getId());
         result.put("chat", chatModel);
         return result;
+    }
+
+    public List<RequestModel> userRequests(String userId) throws Exception {
+        UserModel byId = mongoTemplate.findById(userId, UserModel.class);
+        if (byId == null) throw new Exception("user not found");
+        List<String> requestIds = byId.getRequestIds();
+
+        Query query = new Query();
+        query.addCriteria(Criteria.where("_id").in(byId.getRequestIds()));
+
+        return mongoTemplate.find(query, RequestModel.class);
     }
 }

@@ -1,6 +1,6 @@
 package com.lmptech.intune.services;
 
-import com.lmptech.intune.data.models.UserModel;
+import com.lmptech.intune.models.UserModel;
 import com.lmptech.intune.utility.JwtUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;

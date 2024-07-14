@@ -1,4 +1,4 @@
-package com.lmptech.intune.data.models;
+package com.lmptech.intune.models;
 
 import lombok.*;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -12,6 +12,6 @@ import org.springframework.data.mongodb.core.mapping.MongoId;
 public class RequestModel {
     @MongoId
     String id;
-    String senderId;
-    String receiverId;
+    UserModel sender;
+    UserModel receiver;
 }

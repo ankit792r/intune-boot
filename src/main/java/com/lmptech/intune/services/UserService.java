@@ -1,6 +1,6 @@
 package com.lmptech.intune.services;
 
-import com.lmptech.intune.data.models.UserModel;
+import com.lmptech.intune.models.UserModel;
 import com.mongodb.client.result.UpdateResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -43,8 +43,8 @@ public class UserService {
     }
 
     public void createUser(UserModel userModel) {
-        userModel.setRequests(new ArrayList<>());
-        userModel.setChats(new ArrayList<>());
+        userModel.setRequestIds(new ArrayList<>());
+        userModel.setChatIds(new ArrayList<>());
         userModel.setPassword(passwordEncoder.encode(userModel.getPassword()));
         mongoTemplate.insert(userModel, "Users");
     }

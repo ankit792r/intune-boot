@@ -1,12 +1,11 @@
 package com.lmptech.intune.controllers;
 
-import com.lmptech.intune.data.models.UserModel;
-import com.lmptech.intune.data.models.response.ErrorMessage;
+import com.lmptech.intune.models.UserModel;
+import com.lmptech.intune.models.ErrorMessage;
 import com.lmptech.intune.services.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
