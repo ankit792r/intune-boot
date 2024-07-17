@@ -35,6 +35,7 @@ public class AuthService {
             String refresh = jwtUtility.generateJWTToken(new HashMap<>(), principal.getUsername(), false);
 
             Map<String, String> response = new HashMap<>();
+            response.put("userId", principal.getUsername());
             response.put("accessToken", access);
             response.put("refreshToken", refresh);
 
