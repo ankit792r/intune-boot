@@ -12,7 +12,6 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,17 +33,17 @@ public class ChatService {
     }
 
     // TODO make transaction
-    public RequestModel newChatRequest(String senderUsername, String receiverUsername) throws Exception {
+    public RequestModel newChatRequest(Map<String, String> requestMap) throws Exception {
         Query query = new Query();
-        query.addCriteria(Criteria.where("username").in(senderUsername, receiverUsername));
+        query.addCriteria(Criteria.where("username").in(requestMap.get("sender"), requestMap.get("receiver")));
         query.fields().include("username");
 
         List<UserModel> userModels = mongoTemplate.find(query, UserModel.class);
-        if (userModels.size() != 2) throw new Exception(String.format("user with username %s is not exists", receiverUsername));
+        if (userModels.size() != 2) throw new Exception(String.format("user with username %s is not exists", requestMap.get("receiver")));
 
         // TODO check weather sender is last or receiver
         RequestModel request = mongoTemplate.insert(
-                new RequestModel(null, userModels.getFirst(), userModels.getLast()), "Requests");
+                new RequestModel(null, userModels.getLast(), userModels.getFirst()), "Requests");
 
         Update update = new Update();
         update.push("requestIds", request.getId());
@@ -76,7 +75,7 @@ public class ChatService {
     }
 
     // TODO only receiver can accept the request
-    public Map<String, Object> acceptChatRequest(String requestId) throws Exception {
+    public ChatModel acceptChatRequest(String requestId) throws Exception {
         Query query = new Query();
         query.addCriteria(Criteria.where("_id").is(requestId));
         RequestModel removedRequest = mongoTemplate.findAndRemove(query, RequestModel.class);
@@ -93,16 +92,12 @@ public class ChatService {
         update.push("chatIds", chatModel.getId());
         mongoTemplate.updateMulti(userQuery, update, UserModel.class);
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("requestId", removedRequest.getId());
-        result.put("chat", chatModel);
-        return result;
+        return chatModel;
     }
 
     public List<RequestModel> getUserRequests(String userId) throws Exception {
         UserModel byId = mongoTemplate.findById(userId, UserModel.class);
         if (byId == null) throw new Exception("user not found");
-        List<String> requestIds = byId.getRequestIds();
 
         Query query = new Query();
         query.addCriteria(Criteria.where("_id").in(byId.getRequestIds()));

@@ -15,3 +15,4 @@ public class RequestModel {
     UserModel sender;
     UserModel receiver;
 }
+
