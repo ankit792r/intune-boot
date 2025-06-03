@@ -1,4 +1,4 @@
-package com.x64tech.intune.http
+package com.x64tech.intune.utils
 
 data class ApiResponse<T>(
     val success: Boolean = true,

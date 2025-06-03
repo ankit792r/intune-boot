@@ -1,4 +1,4 @@
-package com.x64tech.intune.http
+package com.x64tech.intune.utils
 
 import com.x64tech.intune.services.DetailService
 import com.x64tech.intune.services.JwtService
