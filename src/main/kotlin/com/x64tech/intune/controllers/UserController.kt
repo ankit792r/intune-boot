@@ -1,6 +1,6 @@
 package com.x64tech.intune.controllers
 
-import com.x64tech.intune.http.ApiResponse
+import com.x64tech.intune.utils.ApiResponse
 import com.x64tech.intune.models.CreateUserDto
 import com.x64tech.intune.models.UserView
 import com.x64tech.intune.services.UserService
