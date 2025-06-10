@@ -1,5 +1,6 @@
 package com.x64tech.intune.utils
 
+import com.x64tech.intune.entites.CustomUserDetails
 import com.x64tech.intune.services.DetailService
 import com.x64tech.intune.services.JwtService
 import jakarta.servlet.FilterChain
@@ -11,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
+import java.util.*
 
 @Component
 class JwtFilter(
@@ -23,15 +25,15 @@ class JwtFilter(
         filterChain: FilterChain
     ) {
         val header = request.getHeader(AUTHORIZATION)
-        if (header == null || !header.startsWith("Bearer ")) {
+        if (header == null || !header.startsWith("Bearer ") || header.substringAfter("Bearer ").isEmpty()) {
             filterChain.doFilter(request, response)
             return
         }
 
         try {
             val token = header.substringAfter("Bearer ")
-            val username = jwtService.getUsernameFromToken(token)
-            val customUserDetails = detailService.loadUserByUsername(username)
+            val userId = jwtService.getUsernameFromToken(token)
+            val customUserDetails = detailService.loadUserByUsername(userId)
             val authenticationToken =
                 UsernamePasswordAuthenticationToken(
                     customUserDetails,
@@ -41,7 +43,7 @@ class JwtFilter(
             authenticationToken.details = WebAuthenticationDetailsSource().buildDetails(request)
             SecurityContextHolder.getContext().authentication = authenticationToken
 
-            filterChain.doFilter(request, response)
+            request.setAttribute("userId", UUID.fromString(userId))
         } catch (e: Exception) {
             logger.error("Error while doing filter", e)
         }

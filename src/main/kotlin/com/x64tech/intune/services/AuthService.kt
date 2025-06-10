@@ -20,7 +20,7 @@ class AuthService @Autowired constructor(
         if (user.password != loginDto.password)
             throw Exception("Wrong password")
 
-        val token = jwtService.generateToken(user.username)
+        val token = jwtService.generateToken(user.id!!.toString())
         return LoginResponse(token, user.toView())
     }
 }
