@@ -10,16 +10,11 @@ data class CustomUserDetails(
     val uname: String,
     val passwd: String,
     val eMail: String,
-): UserDetails {
-    override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
-        return mutableListOf(SimpleGrantedAuthority("ROLE_USER"))
-    }
+) : UserDetails {
+    override fun getAuthorities(): MutableCollection<out GrantedAuthority> =
+        mutableListOf(SimpleGrantedAuthority("ROLE_USER"))
 
-    override fun getPassword(): String {
-        return passwd
-    }
+    override fun getPassword(): String = passwd
 
-    override fun getUsername(): String {
-        return uname
-    }
+    override fun getUsername(): String = uname
 }

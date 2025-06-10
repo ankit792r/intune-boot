@@ -7,4 +7,5 @@ data class UserView(
     val username: String,
     val name: String?,
     val email: String,
+    val bio: String?,
 )

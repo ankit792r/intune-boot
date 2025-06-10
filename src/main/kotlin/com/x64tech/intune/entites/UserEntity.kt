@@ -21,8 +21,11 @@ data class UserEntity(
 
     @Column(length = 120)
     val name: String?,
+
+    @Column(length = 200)
+    val bio: String?,
 ) {
-    fun toView(): UserView = UserView(id!!, username, name, email)
+    fun toView(): UserView = UserView(id!!, username, name, email, bio)
 
     fun toUserDetails(): CustomUserDetails = CustomUserDetails(id!!, username, password, email)
 }
