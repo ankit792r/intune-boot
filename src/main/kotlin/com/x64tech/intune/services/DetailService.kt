@@ -2,6 +2,7 @@ package com.x64tech.intune.services
 
 import com.x64tech.intune.respositories.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
@@ -12,6 +13,7 @@ import java.util.UUID
 class DetailService @Autowired constructor(
     private val userRepository: UserRepository
 ) : UserDetailsService {
+    @Cacheable(cacheNames = ["userDetails"])
     override fun loadUserByUsername(userId: String?): UserDetails {
         val optionalUser = userRepository.findById(UUID.fromString(userId))
         if (optionalUser.isPresent)
