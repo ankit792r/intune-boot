@@ -12,13 +12,18 @@
 	<artifactId>intune</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>intune</name>
-	<description>Demo project for Spring Boot</description>
-	<url/>
+	<description>Server for intune chat application</description>
+	<url>https://intune.app</url>
 	<licenses>
 		<license/>
 	</licenses>
 	<developers>
-		<developer/>
+		<developer>
+			<name>Ankit Prajapati</name>
+			<email>ap8424856@gmail.com</email>
+			<organization>x64-tech</organization>
+			<organizationUrl>https://x64-tech.com</organizationUrl>
+		</developer>
 	</developers>
 	<scm>
 		<connection/>
