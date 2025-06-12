@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*
 import java.util.*
 
 @RestController(value = "friends")
+@RequestMapping("friends")
 class FriendController @Autowired constructor(
     private val friendService: FriendService,
 ) {
@@ -44,7 +45,7 @@ class FriendController @Autowired constructor(
             throw Exception("Username and friendId both cannot be empty, at least one is required")
 
         val userId = request.getAttribute("userId") as UUID
-        val result: FriendView = if (friendRequestDto.friendId?.equals("") != true)
+        val result: FriendView = if (friendRequestDto.friendId?.equals("") == false)
             friendService.createFriendRequest(userId, friendRequestDto.friendId as UUID)
         else friendService.createFriendRequestWithUsername(userId, friendRequestDto.username as String)
 
@@ -63,8 +64,8 @@ class FriendController @Autowired constructor(
     @DeleteMapping("delete/{friendId}")
     fun deleteFriend(
         @PathVariable("friendId") friendId: String
-    ): ResponseEntity<ApiResponse<Nothing>> {
+    ): ResponseEntity<ApiResponse<String>> {
         friendService.deleteFriend(UUID.fromString(friendId))
-        return ResponseEntity(ApiResponse(success = true, message = "friend deleted"), HttpStatus.NO_CONTENT)
+        return ResponseEntity(ApiResponse(success = true, message = "friend deleted", data = friendId), HttpStatus.NO_CONTENT)
     }
 }
