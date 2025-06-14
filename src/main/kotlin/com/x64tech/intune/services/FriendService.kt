@@ -2,10 +2,11 @@ package com.x64tech.intune.services
 
 import com.x64tech.intune.entites.FriendEntity
 import com.x64tech.intune.models.FriendStatusUpdateDto
-import com.x64tech.intune.models.FriendView
+import com.x64tech.intune.models.views.FriendView
 import com.x64tech.intune.respositories.FriendRepository
 import com.x64tech.intune.respositories.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Service
 import java.util.UUID
 
@@ -13,6 +14,7 @@ import java.util.UUID
 class FriendService @Autowired constructor(
     private val friendRepository : FriendRepository,
     private val userRepository : UserRepository,
+    private val messagingTemplate: SimpMessagingTemplate
 ) {
     fun listFriends(userId: UUID): List<FriendView> {
         val result = friendRepository.getUsersFriends(userId)
@@ -39,10 +41,14 @@ class FriendService @Autowired constructor(
         val user = userRepository.findById(userId)
         val acceptor = userRepository.findById(friendId)
 
-        if (user.isPresent && acceptor.isPresent)
-            return friendRepository.save(
+        if (user.isPresent && acceptor.isPresent) {
+            val friendView = friendRepository.save(
                 FriendEntity(null, "REQUEST", user.get(), acceptor.get())
             ).toView()
+
+            messagingTemplate.convertAndSendToUser(acceptor.get().username, "/topic/friends/request", friendView)
+            return friendView
+        }
 
         throw Exception("sender or acceptor does not exist")
     }

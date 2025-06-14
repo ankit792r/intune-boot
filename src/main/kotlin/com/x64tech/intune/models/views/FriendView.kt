@@ -1,4 +1,4 @@
-package com.x64tech.intune.models
+package com.x64tech.intune.models.views
 
 import java.util.*
 

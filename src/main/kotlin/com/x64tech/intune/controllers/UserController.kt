@@ -1,6 +1,7 @@
 package com.x64tech.intune.controllers
 
 import com.x64tech.intune.models.*
+import com.x64tech.intune.models.views.UserView
 import com.x64tech.intune.utils.ApiResponse
 import com.x64tech.intune.services.UserService
 import jakarta.servlet.http.HttpServletRequest

@@ -2,7 +2,7 @@ package com.x64tech.intune.controllers
 
 import com.x64tech.intune.models.FriendRequestDto
 import com.x64tech.intune.models.FriendStatusUpdateDto
-import com.x64tech.intune.models.FriendView
+import com.x64tech.intune.models.views.FriendView
 import com.x64tech.intune.services.FriendService
 import com.x64tech.intune.utils.ApiResponse
 import jakarta.servlet.http.HttpServletRequest

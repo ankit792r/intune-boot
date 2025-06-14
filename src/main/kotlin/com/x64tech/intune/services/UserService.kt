@@ -2,6 +2,7 @@ package com.x64tech.intune.services
 
 import com.x64tech.intune.entites.UserEntity
 import com.x64tech.intune.models.*
+import com.x64tech.intune.models.views.UserView
 import com.x64tech.intune.respositories.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service

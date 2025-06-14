@@ -53,6 +53,7 @@ class SecurityConfig @Autowired constructor(
                 authorize(HttpMethod.POST, "/auth/login", permitAll)
                 authorize(HttpMethod.POST, "/user/register", permitAll)
                 authorize(HttpMethod.GET, "/common/public", permitAll)
+                authorize("/ws/**", permitAll)
                 authorize(anyRequest, authenticated)
             }
             addFilterBefore<UsernamePasswordAuthenticationFilter>(jwtFilter)

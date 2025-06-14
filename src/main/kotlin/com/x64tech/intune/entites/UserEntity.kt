@@ -1,6 +1,6 @@
 package com.x64tech.intune.entites
 
-import com.x64tech.intune.models.UserView
+import com.x64tech.intune.models.views.UserView
 import jakarta.persistence.*
 import java.util.UUID
 
