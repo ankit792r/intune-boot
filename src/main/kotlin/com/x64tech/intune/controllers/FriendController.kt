@@ -66,6 +66,6 @@ class FriendController @Autowired constructor(
         @PathVariable("friendId") friendId: String
     ): ResponseEntity<ApiResponse<String>> {
         friendService.deleteFriend(UUID.fromString(friendId))
-        return ResponseEntity(ApiResponse(success = true, message = "friend deleted", data = friendId), HttpStatus.NO_CONTENT)
+        return ResponseEntity(ApiResponse(success = true, message = "friend deleted", data = friendId), HttpStatus.OK)
     }
 }

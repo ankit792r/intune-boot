@@ -6,7 +6,6 @@ import com.x64tech.intune.models.views.FriendView
 import com.x64tech.intune.respositories.FriendRepository
 import com.x64tech.intune.respositories.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Service
 import java.util.UUID
 
@@ -14,7 +13,6 @@ import java.util.UUID
 class FriendService @Autowired constructor(
     private val friendRepository : FriendRepository,
     private val userRepository : UserRepository,
-    private val messagingTemplate: SimpMessagingTemplate
 ) {
     fun listFriends(userId: UUID): List<FriendView> {
         val result = friendRepository.getUsersFriends(userId)
@@ -46,7 +44,6 @@ class FriendService @Autowired constructor(
                 FriendEntity(null, "REQUEST", user.get(), acceptor.get())
             ).toView()
 
-            messagingTemplate.convertAndSendToUser(acceptor.get().username, "/topic/friends/request", friendView)
             return friendView
         }
 

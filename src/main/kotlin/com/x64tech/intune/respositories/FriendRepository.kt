@@ -14,6 +14,6 @@ interface FriendRepository: JpaRepository<FriendEntity, UUID> {
     @Query("select f from FriendEntity f where f.initiator.id = :userId and f.acceptor.id = :friendId")
     fun getFriendRequestSentAlready(userId: UUID, friendId: UUID): Optional<FriendEntity>
 
-    @Query("select f from FriendEntity f where f.initiator.id = :userId or f.acceptor.id = :userId and f.status = 'REQUEST' ")
+    @Query("select f from FriendEntity f where (f.initiator.id = :userId or f.acceptor.id = :userId) and f.status = 'REQUEST' ")
     fun getFriendRequests(userId: UUID): List<FriendEntity>
 }
